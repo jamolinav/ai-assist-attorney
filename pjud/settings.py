@@ -236,9 +236,9 @@ LOGGING = {
             "backupCount": 10,
             "formatter": "verbose",
         },
-        "chatbot_app": {
+        "chatbot": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "chatbot_app.log",
+            "filename": LOGS_DIR / "chatbot.log",
             "maxBytes": 1024 * 1024 * 10,
             "backupCount": 10,
             "formatter": "verbose",
@@ -258,8 +258,8 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
-        "chatbot_app": {
-            "handlers": ["chatbot_app"],
+        "chatbot": {
+            "handlers": ["chatbot"],
             "level": "DEBUG",
             "propagate": True,
         },

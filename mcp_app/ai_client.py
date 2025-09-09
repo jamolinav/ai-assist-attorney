@@ -38,23 +38,22 @@ def send_message_with_assistant(request, messages, functions):
     try:
         # Revisa si ya existe un thread en la sesión
         thread_id = request.session.get("openai_thread_id")
-
         thread = None
+
         if thread_id:
-            # Si ya existe, lo reutiliza
             try:
                 thread = client.beta.threads.retrieve(thread_id)
                 logger.info(f"Reutilizando thread existente: {thread_id}")
             except Exception as e:
                 logger.error(f"Error al reutilizar thread: {e}")
-        
+
         if not thread:
             # Si no existe, crea uno nuevo y lo guarda en sesión
             thread = client.beta.threads.create()
             request.session["openai_thread_id"] = thread.id
             logger.info(f"Creado nuevo thread: {thread.id}")
 
-        # Añade el mensaje al thread
+        # Añade el último mensaje del usuario al thread
         client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
@@ -68,30 +67,24 @@ def send_message_with_assistant(request, messages, functions):
             tools=[{"type": "function", "function": f} for f in functions],
         )
 
-        # Espera a que el run termine
-        MAX_WAIT = 30  # segundos máximo para esperar
+        # Espera a que el run termine (con timeout)
+        MAX_WAIT = 180  # segundos máximo para esperar
         waited = 0
 
         while True:
             run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
             logger.info(f"Estado del run: {run.status}")
-            
+
             if run.status in ["completed", "failed", "cancelled"]:
                 break
-            elif run.status not in ["queued", "in_progress", "requires_action"]:
+
+            if run.status not in ["queued", "in_progress", "requires_action"]:
                 logger.error(f"Estado inesperado del run: {run.status}")
                 break
 
-            time.sleep(2)
-            waited += 2
-            if waited > MAX_WAIT:
-                logger.error(f"Timeout esperando el run: {run.id}")
-                raise TimeoutError(f"Run {run.id} no terminó después de {MAX_WAIT} segundos")
-
             if run.status == "requires_action":
-                # Obtener las llamadas a herramientas (funciones) requeridas
+                # Obtener y ejecutar llamadas a herramientas (funciones)
                 tool_calls = run.required_action.submit_tool_outputs.tool_calls
-
                 outputs = []
                 for tool_call in tool_calls:
                     func_name = tool_call.function.name
@@ -100,61 +93,102 @@ def send_message_with_assistant(request, messages, functions):
                     args["user_id"] = request.user.id
                     logger.info(f"Argumentos: {args}")
                     func = tools.get(func_name)
-                    result = func(args)  # ejecuta tu función real con los parámetros dados
+                    result = func(args)
                     outputs.append({
                         "tool_call_id": tool_call.id,
                         "output": json.dumps(result, cls=DateTimeEncoder)
                     })
 
                 logger.info(f"Resultados de las funciones: {outputs}")
-                # Enviar las respuestas de las funciones al Assistant
+
                 run = client.beta.threads.runs.submit_tool_outputs(
                     thread_id=thread.id,
                     run_id=run.id,
                     tool_outputs=outputs
                 )
 
-                logger.info(f"Estado del run después de enviar resultados: {run.status}")
                 # Espera nuevamente a que finalice la ejecución
+                inner_waited = 0
                 while True:
                     run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
                     logger.info(f"Estado del run: {run.status}")
-                    if run.status == "completed":
+                    if run.status in ["completed", "failed", "cancelled"]:
                         break
-                    time.sleep(1)  # espera un poco antes de volver a consultar
+                    time.sleep(1)
+                    inner_waited += 1
+                    if waited + inner_waited > MAX_WAIT:
+                        logger.error(f"Timeout esperando el run tras tools: {run.id}")
+                        raise TimeoutError(f"Run {run.id} no terminó después de {MAX_WAIT} segundos")
+                # Acumula el tiempo de espera interno
+                waited += inner_waited
 
-        # Recupera el mensaje final del assistant
-        messages = client.beta.threads.messages.list(thread_id=thread.id)
+            # Espera incremental cuando no hay requires_action
+            if run.status in ["queued", "in_progress"]:
+                time.sleep(2)
+                waited += 2
+                if waited > MAX_WAIT:
+                    logger.error(f"Timeout esperando el run: {run.id}")
+                    raise TimeoutError(f"Run {run.id} no terminó después de {MAX_WAIT} segundos")
 
-        logger.info(f"Mensajes en el thread: {messages}")
+        # Recupera los mensajes del thread
+        thread_messages = client.beta.threads.messages.list(thread_id=thread.id)
+        logger.info(f"Mensajes en el thread: {thread_messages}")
 
-        last_message = messages.data[0]
+        # Intenta encontrar el último mensaje del assistant con contenido de texto
+        assistant_role = "assistant"
+        content_text = None
 
-        # Devuelve el mensaje como un objeto estándar para que lo puedas interpretar igual que con chat.completions
+        for msg in thread_messages.data:
+            if getattr(msg, "role", "") == "assistant":
+                try:
+                    # Busca el primer bloque de tipo text
+                    for block in getattr(msg, "content", []) or []:
+                        if getattr(block, "type", "") == "text":
+                            value = getattr(block.text, "value", None)
+                            if isinstance(value, str) and value.strip():
+                                content_text = value
+                                break
+                    if content_text:
+                        assistant_role = msg.role
+                        break
+                except Exception:
+                    # Si algo falla, sigue buscando otros mensajes
+                    pass
+
+        # Fallback si no encontramos texto (p.ej. solo tool_outputs/imágenes)
+        if not content_text:
+            content_text = "No se encontró una respuesta de texto del asistente."
+            # Si el run falló, refleja mejor el estado
+            if getattr(run, "status", "") == "failed":
+                content_text = "La ejecución del asistente falló al generar una respuesta."
+
+        # Construye SIEMPRE la respuesta normalizada tipo chat.completions
         response = {
             "choices": [
                 {
                     "message": {
-                        "role": last_message.role,
-                        "content": last_message.content[0].text.value
+                        "role": assistant_role,
+                        "content": content_text
                     }
                 }
             ]
         }
-        logger.info(f"Respuesta final: {response}")
 
-        return last_message.content[0].text.value
+        logger.info(f"Respuesta final normalizada: {response}")
+        return response
 
     except Exception as e:
         logger.error(f"Error en send_message_with_assistant: {e}")
         logger.error(f"Detalles del error: {traceback.format_exc()}")
-        # Manejo de errores: puedes devolver un mensaje de error o un objeto vacío
+        # Devuelve SIEMPRE dict normalizado en errores
         return {
             "choices": [
                 {
                     "message": {
+                        "role": "assistant",
                         "content": "Lo siento, ha ocurrido un error al procesar tu solicitud."
                     }
                 }
             ]
         }
+
