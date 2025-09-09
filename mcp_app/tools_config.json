@@ -1,0 +1,9 @@
+{
+    "tools": {
+      "get_demanda": {
+        "module": "mcp_app.tools.get_demanda",
+        "method": "run"
+      }
+    }
+  }
+  

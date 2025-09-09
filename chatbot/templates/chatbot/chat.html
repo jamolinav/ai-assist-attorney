@@ -1,0 +1,74 @@
+{% extends 'chatbot/base.html' %}
+{% load static i18n %}
+{% block title %}Chat — Abogado Virtual{% endblock %}
+{% block content %}
+    <div class="chat-container">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <!-- Header fixed at top -->
+                <div id="chat-header" class="chat-header p-3 border-bottom">
+                    <h1 class="h5 mb-0">Asistente Virtual</h1>
+                    <div class="d-flex align-items-center">
+                        <span id="chat-status" class="badge rounded-pill bg-success me-2">
+                            <span class="status-dot"></span> Activo
+                        </span>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">Estado del proceso</h6></li>
+                                <li><div class="dropdown-item-text">
+                                    <ul id="progress-steps" class="list-unstyled small mb-0">
+                                        <li data-step="queued">En cola</li>
+                                        <li data-step="gathering_context">Preparando contexto</li>
+                                        <li data-step="calling_llm">Consultando al modelo</li>
+                                        <li data-step="streaming_answer">Transmitiendo respuesta</li>
+                                        <li data-step="done">Completado</li>
+                                    </ul>
+                                </div></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">Límites de uso</h6></li>
+                                <li><div class="dropdown-item-text">
+                                    <p class="mb-1 small" id="limits-minute">Por minuto: —</p>
+                                    <p class="mb-0 small" id="limits-day">Por día: —</p>
+                                </div></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Scrollable chat history -->
+                <div id="chat-log" class="chat-log" role="log" aria-live="polite" aria-relevant="additions"></div>
+                
+                <!-- Fixed input area at bottom -->
+                <div class="chat-input-container">
+                    <form id="chat-form" aria-label="Formulario de chat">
+                        <div class="chat-input-wrapper">
+                            <textarea id="question" class="form-control chat-input" rows="1" placeholder="Escribe tu pregunta aquí..." maxlength="3000" required></textarea>
+                            <button class="btn btn-primary rounded-circle chat-send-btn" id="send-btn" type="submit" aria-label="Enviar mensaje">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </div>
+                        <div id="progress-indicator" class="d-none progress-indicator mt-2" aria-live="polite">
+                            <div class="typing-indicator">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <span class="ms-2">Procesando respuesta...</span>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Accessibility indicator for mobile users -->
+                <div class="d-md-none text-center mt-2 small text-muted scroll-hint">
+                    <i class="bi bi-arrow-up-down me-1"></i> Desliza para ver más mensajes
+                </div>
+            </div>
+        </div>
+    </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

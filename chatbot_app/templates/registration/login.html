@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        form {
+            background: white;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <h2>Iniciar sesión</h2>
+        {{ form.as_p }}
+        <button type="submit">Ingresar</button>
+    </form>
+</body>
+</html>

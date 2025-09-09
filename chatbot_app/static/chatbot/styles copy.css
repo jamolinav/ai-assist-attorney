@@ -1,0 +1,129 @@
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f2f4f8;
+    color: #1a1a1a;
+}
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 1rem;
+    background-color: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    margin-top: 2rem;
+}
+
+h1 {
+    font-size: 1.5rem;
+    text-align: center;
+    color: #2c3e50;
+}
+
+#chat-box {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.user, .bot {
+    margin-bottom: 1rem;
+}
+
+.user {
+    text-align: right;
+}
+
+.user strong {
+    color: #2c3e50;
+}
+
+.bot strong {
+    color: #2980b9;
+}
+
+.bot p, .user p {
+    display: inline-block;
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    margin-top: 0.25rem;
+}
+
+.user p {
+    background-color: #dff9fb;
+}
+
+.bot p {
+    background-color: #eaf2f8;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+input[type="text"], select {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+}
+
+button {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: none;
+    background-color: #3498db;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#loading-indicator {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 1.2em;
+    color: #888;
+}
+
+.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.json-block pre {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin-top: 1rem;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    input[type="text"], select, button {
+        font-size: 1rem;
+    }
+
+    .bot p, .user p {
+        max-width: 100%;
+    }
+}

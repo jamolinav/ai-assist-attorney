@@ -1,0 +1,315 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Virtual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f2f4f8;
+            color: #1a1a1a;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 1rem;
+            background-color: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        #chat-box {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+
+        .user, .bot {
+            margin-bottom: 1rem;
+        }
+
+        .user {
+            text-align: right;
+        }
+
+        .user strong {
+            color: #2c3e50;
+        }
+
+        .bot strong {
+            color: #2980b9;
+        }
+
+        .bot p, .user p {
+            display: inline-block;
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 16px;
+            margin-top: 0.25rem;
+        }
+
+        .user p {
+            background-color: #dff9fb;
+        }
+
+        .bot p {
+            background-color: #eaf2f8;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        input[type="text"], select {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        button {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #loading-indicator {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #888;
+        }
+
+        .disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .json-block pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin-top: 1rem;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            input[type="text"], select, button {
+                font-size: 1rem;
+            }
+
+            .bot p, .user p {
+                max-width: 100%;
+            }
+        }
+        .code-block {
+            background-color: #f0f4f8;
+            padding: 1em;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            margin: 1em 0;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-size: 1.1rem;
+        }
+
+        ul, ol {
+            margin: 0.5em 1em;
+            padding-left: 1.2em;
+        }
+
+        li {
+            margin-bottom: 0.4em;
+        }
+
+        .respuesta-bot {
+            line-height: 1.6;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Abogado Virtual - {{ version }}</h1>
+        <div id="chat-box"></div>
+
+        <label for="asst_select">Selecciona un Asistente:</label>
+        <select id="asst_select" name="jira_id" required>
+            {% for asst in asst_opciones %}
+                <option value="{{ asst.id }}"{% if forloop.first %} selected{% endif %}>{{ asst.nombre }}</option>
+            {% endfor %}
+        </select>
+
+        <form id="chat-form">
+            <input type="text" id="pregunta" name="pregunta" placeholder="Escribe tu pregunta..." required>
+            <button type="submit" id="enviar-btn">Enviar</button>
+        </form>
+
+        <div id="loading-indicator">🕒 Procesando pregunta...</div>
+    </div>
+
+    <script>
+        function formatFecha(fechaRaw) {
+            const date = new Date(fechaRaw);
+            if (isNaN(date)) return fechaRaw;
+            const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+            const fecha = date.toLocaleDateString('es-ES', opciones);
+            const hora = date.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            return `${fecha}, ${hora} hrs`;
+        }
+
+        function formatRespuesta(respuesta) {
+            const regexFechas = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[+-]\d{2}:\d{2})?/g;
+            respuesta = respuesta.replace(regexFechas, match => formatFecha(match));
+
+            // Bloques de código
+            respuesta = respuesta.replace(/```(bash|html|json)?\s*([\s\S]*?)```/g, (_, lang, code) => {
+                return `<pre class="code-block"><code class="${lang || ''}">${code.trim()}</code></pre>`;
+            });
+
+            // Títulos tipo Markdown ###
+            respuesta = respuesta.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+
+            // Listas ordenadas
+            respuesta = respuesta.replace(/^\d+\.\s+(.*)$/gm, '<li>$1</li>');
+            respuesta = respuesta.replace(/(<li>.*<\/li>)/gs, '<ol>$1</ol>');
+
+            // Listas no ordenadas
+            respuesta = respuesta.replace(/^- (.*)$/gm, '<li>$1</li>');
+            respuesta = respuesta.replace(/(<li>.*<\/li>)/gs, m => {
+                return m.includes('<ol>') ? m : `<ul>${m}</ul>`;
+            });
+
+            return `<div class="respuesta-bot">${respuesta}</div>`;
+        }
+
+
+        const chatForm = document.getElementById('chat-form');
+        const preguntaInput = document.getElementById('pregunta');
+        const enviarBtn = document.getElementById('enviar-btn');
+        const chatBox = document.getElementById('chat-box');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        loadingIndicator.style.display = 'none';
+        chatForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const pregunta = preguntaInput.value.trim();
+            if (!pregunta) return;
+
+            const asstSelect = document.getElementById('asst_select');
+            const asstId = asstSelect.value;
+
+            if (!asstId) {
+                alert('⚠️ Debes seleccionar un Asistente antes de continuar.');
+                return;
+            }
+
+            chatBox.innerHTML += `<div class="user"><strong>Tú:</strong><p>${pregunta}</p></div>`;
+            preguntaInput.disabled = true;
+            enviarBtn.disabled = true;
+            loadingIndicator.style.display = 'block';
+
+            let timeoutReached = false;
+            const timeout = setTimeout(() => {
+                timeoutReached = true;
+                loadingIndicator.style.display = 'none';
+                preguntaInput.disabled = false;
+                enviarBtn.disabled = false;
+                chatBox.innerHTML += `<div class="bot"><strong>Bot:</strong><p>Tiempo de espera agotado. Intenta nuevamente.</p></div>`;
+            }, 60000);
+
+            try {
+                const formData = new FormData();
+                formData.append('pregunta', pregunta);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                formData.append('asst_id', asstId);
+
+                const response = await fetch('send-question/', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+
+                if (timeoutReached) return;
+
+                clearTimeout(timeout);
+                const data = await response.json();
+                let respuesta = data.response?.respuesta || 'No se pudo obtener respuesta.';
+
+                const jsonRegex = /### JSON:\s*```json\s*([\s\S]*?)```/i;
+                const match = respuesta.match(jsonRegex);
+
+                let htmlFinal = respuesta;
+                htmlFinal = htmlFinal.replace(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?(?:\+\d{2}:\d{2})?/g, match => formatFecha(match));
+
+                if (match) {
+                    const bloqueJSON = match[1].trim();
+                    htmlFinal = respuesta.replace(jsonRegex, '');
+                    htmlFinal += `<div class="json-block"><strong>Datos detectados:</strong><pre>${bloqueJSON}</pre></div>`;
+                }
+
+                chatBox.innerHTML += `<div class="bot"><strong>Bot:</strong>${formatRespuesta(htmlFinal)}</div>`;
+            } catch (error) {
+                if (!timeoutReached) {
+                    clearTimeout(timeout);
+                    chatBox.innerHTML += `<div class="bot"><strong>Bot:</strong><p>Error al procesar la solicitud.</p></div>`;
+                }
+            } finally {
+                if (!timeoutReached) {
+                    preguntaInput.disabled = false;
+                    enviarBtn.disabled = false;
+                    loadingIndicator.style.display = 'none';
+                    preguntaInput.value = '';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
