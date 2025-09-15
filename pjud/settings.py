@@ -198,6 +198,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGOUT_REDIRECT_URL = '/chatbot/chat/'
 
+CELERY_BROKER_URL       = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
+CELERY_RESULT_BACKEND   = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
+# Configuración del broker Redis para Celery
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "visibility_timeout": 3600,  # Tiempo máximo en cola antes de expirar (1 hora)
+    "retry_policy": {            # Política de reintento en caso de fallo
+        "max_retries": 5,        # Número máximo de reintentos
+        "interval_start": 0.1,   # Primer reintento después de 100ms
+        "interval_step": 0.5,    # Aumenta el tiempo de espera exponencialmente
+        "interval_max": 10,      # Máximo tiempo de espera entre reintentos
+    },
+    "socket_keepalive": True,   # Mantiene la conexión activa
+}
+
+# Configuración de resultados de Celery en Redis
+CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = {
+    "retry_policy": CELERY_BROKER_TRANSPORT_OPTIONS["retry_policy"],
+}
+
+CELERY_ACCEPT_CONTENT = ['json']
+
 PJUD_VERSION = 'v1.1.2'
 
 # EMAIL_BACKEND

@@ -25,6 +25,217 @@
     --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
 }
 
+/* Estilos para el fondo oscuro con efecto de gradiente */
+body {
+    background: linear-gradient(135deg, #121212 0%, #1a1a1a 50%, #0f0f0f 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+    color: var(--dark-text);
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('{% static "chatbot/images/pattern.svg" %}') center/cover no-repeat fixed;
+    opacity: 0.03;
+    z-index: -1;
+    filter: invert(1);
+}
+
+/* Puntos luminosos flotantes en el fondo */
+.glow-point {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    filter: blur(8px);
+    animation: floatAnimation 15s infinite ease-in-out;
+    background: var(--accent-color);
+    z-index: -1;
+}
+
+@keyframes floatAnimation {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(5%, 10%); }
+    50% { transform: translate(-5%, 5%); }
+    75% { transform: translate(10%, -5%); }
+}
+
+/* Mejora para la tarjeta principal del chat con efecto de cristal oscuro */
+.chat-container .card {
+    background-color: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+                0 0 20px var(--glow-color);
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+/* Mejora para el header del chat con borde luminoso */
+.chat-header {
+    background-color: rgba(30, 30, 30, 0.9);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.chat-header h1 {
+    color: var(--dark-text);
+    background: var(--accent-gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+}
+
+/* Burbujas de chat con efecto de cristal oscuro */
+.message .bubble {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+}
+
+.message.assistant .bubble {
+    background: linear-gradient(to right bottom, rgba(42, 42, 42, 0.9), rgba(30, 30, 30, 0.7));
+    backdrop-filter: blur(10px);
+    color: var(--dark-text);
+    border-left: 2px solid var(--accent-color-light);
+}
+
+.message.user .bubble {
+    background: linear-gradient(to right bottom, rgba(67, 97, 238, 0.9), rgba(67, 97, 238, 0.7));
+    color: white;
+    box-shadow: 0 3px 10px rgba(67, 97, 238, 0.3);
+    border-right: 2px solid white;
+}
+
+/* Container de input con efecto glassmorphism oscuro y borde luminoso */
+.chat-input-container {
+    background-color: rgba(30, 30, 30, 0.9);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(138, 43, 226, 0.3);
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Área de texto con estilo oscuro */
+.chat-input-wrapper {
+    background-color: rgba(45, 45, 45, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.chat-input-wrapper:focus-within {
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2), 0 0 15px var(--glow-color);
+}
+
+/* Input de texto con estilo oscuro */
+.chat-input {
+    background: transparent;
+    color: var(--dark-text);
+}
+
+.chat-input::placeholder {
+    color: var(--dark-text-secondary);
+    opacity: 0.7;
+}
+
+/* Botón de enviar con estilo llamativo */
+.chat-send-btn {
+    background: var(--accent-gradient);
+    border: none;
+    box-shadow: 0 0 10px var(--glow-color);
+    transition: all 0.3s ease;
+}
+
+.chat-send-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+/* Indicador de escritura con colores oscuros */
+.typing-indicator span {
+    background: var(--accent-color);
+}
+
+/* Estilo para badges y status */
+.badge.bg-success {
+    background: linear-gradient(to right, #00b09b, #96c93d) !important;
+}
+
+#chat-status .status-dot {
+    background-color: #96c93d;
+}
+
+/* Dropdown con estilo oscuro */
+.dropdown-menu {
+    background-color: var(--dark-surface);
+    border: 1px solid var(--dark-border);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-header, .dropdown-item-text {
+    color: var(--dark-text);
+}
+
+.dropdown-divider {
+    border-top: 1px solid var(--dark-border);
+}
+
+/* Botón de scroll animado */
+.scroll-bottom-btn {
+    background: var(--accent-gradient);
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+/* Animación de degradado del background */
+@keyframes gradientAnimation {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+/* Animación de brillo */
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px var(--glow-color); }
+    50% { box-shadow: 0 0 20px var(--glow-color), 0 0 30px var(--glow-color); }
+}
+
+@media (min-width: 768px) {
+    .chat-container {
+        margin: 2rem auto;
+        max-width: 900px;
+    }
+    
+    .chat-container .card {
+        min-height: 80vh;
+    }
+    
+    .message .content {
+        max-width: 85%;
+    }
+}
+
+@media (max-width: 767px) {
+    .message .content {
+        max-width: 90%;
+    }
+    
+    .message.user {
+        margin-left: 10%;
+    }
+    
+    .message.assistant {
+        margin-right: 10%;
+    }
+}
+
 /* Chat Container Layout */
 .chat-container {
     max-width: 960px;
@@ -220,7 +431,8 @@
 .message .content {
     display: flex;
     flex-direction: column;
-    max-width: 75%;
+    max-width: 85%;
+    width: 100%;
 }
 
 .message .bubble {
@@ -232,6 +444,10 @@
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     transition: all 0.3s ease;
+    width: fit-content;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .message.user .bubble {
@@ -241,6 +457,7 @@
     align-self: flex-end;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+    margin-left: auto;
 }
 
 .message.assistant .bubble {
@@ -254,6 +471,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(138, 43, 226, 0.1);
     position: relative;
     overflow: hidden;
+    margin-right: auto;
 }
 
 .message.assistant .bubble::after {
@@ -286,6 +504,9 @@
     overflow-x: auto;
     color: #e0e0e0;
     font-size: 0.9rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .message.assistant .bubble code {
