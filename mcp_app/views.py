@@ -10,7 +10,7 @@ import logging
 from rest_framework import permissions
 
 # Configuración del logger
-logger = logging.getLogger('mcp_app')
+logger = logging.getLogger('mcp')
 
 # Create your views here.
 class MCPEndpoint(APIView):

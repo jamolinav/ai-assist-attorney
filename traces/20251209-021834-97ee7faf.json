@@ -1,0 +1,10 @@
+{
+  "demand_id": 4,
+  "question": "Estado actual de la causa, partes involucradas, abogados y acciones relevantes.",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2025-12-09/demand_4.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "La causa C-45-2025 está en fase de prueba, con el Servicio de Vivienda y Urbanización Región Arica y Parinacota como demandante y Andreus como demandado. La abogada Dayan Vega Díaz representa al demandante. Se han presentado excepciones por parte de la demandada y se están programando audiencias para recibir pruebas testimoniales.",
+  "ts": "2025-12-09T02:18:34.102761"
+}

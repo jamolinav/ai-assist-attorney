@@ -45,7 +45,7 @@ WEBSITE_SITE_NAME = '' if os.environ.get('WEBSITE_SITE_NAME') is None else os.en
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Add your app URLs here
-    path('causas/', include('causas_app.urls')),
+    path('civil/', include('civil.urls')),
     path('chatbot/', include('chatbot.urls')),
     #path('chatbot/', include('chatbot_app.urls')),
     path('mcp/', include('mcp_app.urls')),

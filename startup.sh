@@ -1,0 +1,1 @@
+exec gunicorn pjud.asgi:application -k uvicorn.workers.UvicornWorker -w 1 -b 0.0.0.0:8100 --timeout 600

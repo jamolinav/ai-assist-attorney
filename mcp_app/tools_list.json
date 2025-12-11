@@ -1,0 +1,69 @@
+[
+    {
+        "name": "get_demanda",
+        "description": "Obtiene la demanda de un caso judicial.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "RIT": {"type": "string"},
+                "Competencia": {"type": "number"},
+                "Corte": {"type": "number"},
+                "Tribunal": {"type": "number"}
+            },
+            "required": ["RIT", "Competencia", "Corte", "Tribunal"]
+        }
+    },
+    {
+        "name": "get_competencias",
+        "description": "Obtiene las competencias habilitadas en el sistema.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+            },
+            "required": []
+        }
+    },
+    {
+        "name": "get_cortes",
+        "description": "Obtiene las cortes asociadas a una competencia",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "competencia": {
+                    "type": "number",
+                    "description": "id de la competencia"
+                }
+            },
+            "required": ["competencia"]
+        }
+    },
+    {
+        "name": "get_tribunales",
+        "description": "Obtiene los tribunales (juzgados) asociados a una corte",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "corte": {
+                    "type": "number",
+                    "description": "id de la corte"
+                }
+            },
+            "required": ["corte"]
+        }
+    },
+    {
+        "name": "rag_search",
+        "description": "Realiza búsqueda semántica sobre resúmenes de conversaciones usando embeddings vectoriales.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "demand_id": {"type": "integer", "description": "ID de la demanda en la base de datos"},
+                "question": {"type": "string", "description": "Pregunta o consulta a buscar semánticamente"},
+                "k": {"type": "integer", "minimum": 1, "maximum": 50, "default": 8, "description": "Número máximo de resultados a retornar"}
+            },
+            "required": ["demand_id", "question"],
+            "additionalProperties": false
+        }
+    }
+]
+  

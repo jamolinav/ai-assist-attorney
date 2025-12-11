@@ -7,9 +7,9 @@ from openai import OpenAI
 import logging
 import traceback
 from django.http import JsonResponse
-import time
+import traceback
 
-logger = logging.getLogger('mcp_app')
+logger = logging.getLogger('mcp')
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -23,7 +23,7 @@ class MCPProcessor:
     def __init__(self):
         self.tools = load_tools_config()
         self.context_memory = []
-        self.function_descriptions = self.generate_function_descriptions()
+        #self.function_descriptions = self.generate_function_descriptions()
         self.client = OpenAI(api_key="")
 
     def generate_function_descriptions(self):
@@ -41,13 +41,77 @@ class MCPProcessor:
                     },
                     "required": ["RIT", "CORTE", "Tribunal"],
                 }
+            },
+            {
+                "name": "get_competencias",
+                "description": "Obtiene las competencias civiles de un tribunal en Chile a partir de su código.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "tribunal_code": {"type": "string"}
+                    },
+                    "required": ["tribunal_code"],
+                }
+            },
+            {
+                "name": "get_cortes",
+                "description": "Obtiene las cortes asociadas a una competencia",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "competencia": {
+                            "type": "number",
+                            "description": "id de la competencia"
+                        }
+                    },
+                    "required": ["competencia"]
+                }
+            },
+            {
+                "name": "get_tribunales",
+                "description": "Obtiene los tribunales asociados a una corte",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "corte": {
+                            "type": "number",
+                            "description": "id de la corte"
+                        }
+                    },
+                    "required": ["corte"]
+                }
             }
         ]
 
+    def generate_function_descriptions_from_tools_list(self):
+        #  tools_list.jso
+        tools_file_path = os.path.join(os.path.dirname(__file__), 'tools_list.json')
+        logger.info("Generating function descriptions from tools list at {}".format(tools_file_path))
+        try:
+            with open(tools_file_path, 'r') as f:
+                tools_list = json.load(f)
+            
+            function_descriptions = []
+            for tool in tools_list:
+                function_description = {
+                    "name": tool["name"],
+                    "description": tool["description"],
+                    "parameters": tool["parameters"]
+                }
+                function_descriptions.append(function_description)
+            
+            logger.info("Generated function descriptions: {}".format(function_descriptions))
+            return function_descriptions
+        except Exception as e:
+            logger.error("Error generating function descriptions from tools list: {}".format(e))
+            logger.error(traceback.format_exc())
+            return []
+
     def process_conversation(self, request, user_input):
         try:
+            logger.info("Loading tools list from tools_list.json")
             messages = [{"role": "user", "content": user_input}]
-            ai_response = send_message_with_assistant(request, messages, functions=self.function_descriptions)
+            ai_response = send_message_with_assistant(request, messages, functions=self.generate_function_descriptions_from_tools_list())
             logger.info(f"AI response: {ai_response}")
 
             return ai_response

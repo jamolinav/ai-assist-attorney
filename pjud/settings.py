@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 import logging
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,13 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^f@u)9sp(vc0ogca^j7k92(*hms$h8o2hxe0ur@(z*&ba9)77k'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DJANGO_DEBUG", "True").strip().lower() in ("true", "1", "yes", "on")
-
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", os.environ.get("ALLOWED_HOSTS", "*")]
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-key")
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")]
 CSRF_TRUSTED_ORIGINS = [os.environ.get("CSRF_TRUSTED_ORIGINS", "*")]
 
 APPEND_SLASH = True
@@ -36,8 +34,7 @@ WEBSITE_SITE_NAME = os.environ.get('WEBSITE_SITE_NAME', '')
 # Application definition
 
 INSTALLED_APPS = [
-    'causas_app',
-    #'chatbot_app',
+    'civil',
     'chatbot',
     'mcp_app',
     'rest_framework',
@@ -82,10 +79,10 @@ WSGI_APPLICATION = 'pjud.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES_EXTRACTOR = os.environ.get("DATABASES", None)
+DATABASES = os.environ.get("DATABASES", None)
 
-if DATABASES_EXTRACTOR:
-    DATABASES = json.loads(DATABASES_EXTRACTOR)
+if DATABASES:
+    DATABASES = json.loads(DATABASES)
 else:
     SQL_ENGINE = os.environ.get("SQL_ENGINE", "sqlite")
 
@@ -219,7 +216,7 @@ CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = {
 
 CELERY_ACCEPT_CONTENT = ['json']
 
-PJUD_VERSION = 'v1.1.2'
+PJUD_VERSION = 'v1.2.2'
 
 # EMAIL_BACKEND
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
@@ -250,9 +247,16 @@ LOGGING = {
         },
     },
     "handlers": {
-        "causas_app": {
+        "general": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "causas_app.log",
+            "filename": LOGS_DIR / "general.log",
+            "maxBytes": 1024 * 1024 * 10,
+            "backupCount": 10,
+            "formatter": "verbose",
+        },
+        "civil": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": LOGS_DIR / "civil.log",
             "maxBytes": 1024 * 1024 * 10,
             "backupCount": 10,
             "formatter": "verbose",
@@ -264,9 +268,9 @@ LOGGING = {
             "backupCount": 10,
             "formatter": "verbose",
         },
-        "mcp_app": {
+        "mcp": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOGS_DIR / "mcp_app.log",
+            "filename": LOGS_DIR / "mcp.log",
             "maxBytes": 1024 * 1024 * 10,
             "backupCount": 10,
             "formatter": "verbose",
@@ -274,8 +278,13 @@ LOGGING = {
     },
     # The rest of the LOGGING configuration...
     "loggers": {
-        "causas_app": {
-            "handlers": ["causas_app"],
+        "general": {
+            "handlers": ["general"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "civil": {
+            "handlers": ["civil"],
             "level": "DEBUG",
             "propagate": True,
         },
@@ -284,8 +293,8 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
-        "mcp_app": {
-            "handlers": ["mcp_app"],
+        "mcp": {
+            "handlers": ["mcp"],
             "level": "DEBUG",
             "propagate": True,
         },

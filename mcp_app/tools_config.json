@@ -1,9 +1,89 @@
 {
     "tools": {
-      "get_demanda": {
-        "module": "mcp_app.tools.get_demanda",
-        "method": "run"
-      }
+        "get_competencias": {
+            "module": "mcp_app.tools.get_competencias",
+            "method": "execute",
+            "description": "Obtiene las competencias cargadas en el sistema.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        },
+        "get_cortes": {
+            "module": "mcp_app.tools.get_cortes",
+            "method": "execute",
+            "description": "Obtiene las cortes asociadas a una competencia",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "competencia": {
+                        "type": "number",
+                        "description": "id de la competencia"
+                    }
+                },
+                "required": ["competencia"]
+            }
+        },
+        "get_tribunales": {
+            "module": "mcp_app.tools.get_tribunales",
+            "method": "execute",
+            "description": "Obtiene los tribunales (juzgados) asociados a una corte",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "corte": {
+                        "type": "number",
+                        "description": "id de la corte"
+                    }
+                },
+                "required": ["corte"]
+            }
+        },
+        "get_demanda": {
+            "module": "mcp_app.tools.get_demanda",
+            "method": "execute",
+            "description": "Obtiene la demanda de un caso judicial.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "RIT": {"type": "string", "description": "formato (eg: 'C-1234-2020')"},
+                    "Competencia": {"type": "string", "description": "id de la competencia"},
+                    "Corte": {"type": "number", "description": "id de la corte"},
+                    "Tribunal": {"type": "number", "description": "id del tribunal"}
+                },
+                "required": ["RIT", "Corte", "Tribunal"]
+            }
+        },
+        "rag_search": {
+            "module": "mcp_app.tools.rag_search",
+            "method": "execute",
+            "description": "Realiza búsqueda semántica sobre resúmenes de conversaciones usando embeddings vectoriales.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "demand_id": {"type": "integer", "description": "ID de la demanda en la base de datos"},
+                    "question": {"type": "string", "description": "Pregunta o consulta a buscar semánticamente"},
+                    "k": {"type": "integer", "minimum": 1, "maximum": 50, "default": 8, "description": "Número máximo de resultados a retornar"}
+                },
+                "required": ["demand_id", "question"],
+                "additionalProperties": false
+            }
+        },
+        "rag_query": {
+            "module": "mcp_app.tools.rag_query",
+            "method": "execute",
+            "description": "Realiza una búsqueda RAG (Recuperación Augmentada por Generación) en una base de datos SQLite específica de una demanda.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "demand_id": {"type": "integer", "description": "ID de la demanda en la base de datos"},
+                    "query": {"type": "string", "description": "Consulta o pregunta para realizar la búsqueda RAG"},
+                    "k": {"type": "integer", "minimum": 1, "maximum": 50, "default": 8, "description": "Número máximo de resultados a retornar"}
+                },
+                "required": ["demand_id", "query"],
+                "additionalProperties": false
+            }
+        }
     }
-  }
-  
+}

@@ -1,0 +1,10 @@
+{
+  "demand_id": 4,
+  "question": null,
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2025-12-09/demand_4.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "El SERVIU debe cumplir con las normas del derecho administrativo y garantizar el debido proceso, incluyendo la correcta notificación y verificación de antecedentes, para asegurar la validez del título ejecutivo en el cobro de subsidios habitacionales.",
+  "ts": "2025-12-09T02:44:05.502192"
+}

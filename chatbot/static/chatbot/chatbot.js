@@ -55,78 +55,55 @@
     }
 
     // Add message to chat with enhanced animations and effects
+    // ...existing code...
+
+    // Add message to chat with enhanced animations and effects, interpret HTML from server
     function addMessage(role, text) {
         const wrapper = document.createElement('div');
         wrapper.className = `message ${role}`;
-        
-        // Add glassmorphism animation class based on role
         wrapper.classList.add(role === 'assistant' ? 'glass-message' : 'user-message');
-        
+
         // Create avatar with icon
         const avatar = document.createElement('div');
         avatar.className = 'avatar';
         const avatarIcon = document.createElement('i');
-        
-        if (role === 'assistant') {
-            avatarIcon.className = 'bi bi-robot';
-        } else {
-            avatarIcon.className = 'bi bi-person';
-        }
-        
+        avatarIcon.className = role === 'assistant' ? 'bi bi-robot' : 'bi bi-person';
         avatar.appendChild(avatarIcon);
-        
+
         // Create content container
         const content = document.createElement('div');
         content.className = 'content';
-        
+
         // Create message bubble with animation delay
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        
-        // Create animation for longer messages
-        if (text.length > 80) {
-            const words = text.split(' ');
-            bubble.textContent = '';
-            
-            // Only use typing animation for assistant messages
-            if (role === 'assistant' && words.length > 15) {
-                bubble.classList.add('typing-animation');
-                
-                // Initial content to avoid empty bubble
-                bubble.textContent = words.slice(0, 3).join(' ') + '...';
-                
-                // Delay typing effect for natural feel
-                setTimeout(() => {
-                    bubble.textContent = ''; // Clear initial content
-                    bubble.classList.remove('typing-animation');
-                    bubble.textContent = text;
-                }, 300);
-            } else {
-                bubble.textContent = text;
-            }
+
+        // Interpret HTML from server in assistant messages
+        if (role === 'assistant') {
+            bubble.innerHTML = `<strong>${author}:</strong> ${text}`;
         } else {
-            bubble.textContent = text;
+            bubble.textContent = text; // User messages as plain text
         }
-        
+
         // Create metadata (timestamp)
         const meta = document.createElement('div');
         meta.className = 'meta';
         meta.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
+
         // Append everything
         content.appendChild(bubble);
         content.appendChild(meta);
         wrapper.appendChild(avatar);
         wrapper.appendChild(content);
-        
+
         // Add to chat log with animation delay
         chatLog.appendChild(wrapper);
-        
+
         // Add subtle entrance animation
         setTimeout(() => {
             wrapper.classList.add('message-visible');
         }, 50);
-        
+
         // Scroll to bottom with smooth animation
         smoothScrollToBottom();
     }

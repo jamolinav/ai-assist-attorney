@@ -1,0 +1,10 @@
+{
+  "demand_id": 4,
+  "question": null,
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2025-12-09/demand_4.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "El SERVIU, como organismo público, debe cumplir con las normas del derecho administrativo, garantizando el debido proceso y la correcta notificación en procedimientos de cobro ejecutivo, asegurando así la protección de los derechos fundamentales de los afectados.",
+  "ts": "2025-12-09T02:24:10.687967"
+}

@@ -14,9 +14,14 @@ from .services import billing
 from .services.openai_client import generate_answer
 from .services.progress import new_progress, set_state, get_state
 from mcp_app.views import MCPProcessor
+# import settings to get version
+from django.conf import settings
 
 # Configuración del logger
 logger = logging.getLogger('chatbot')
+
+VERSION = settings.PJUD_VERSION
+print("Chatbot version:", VERSION)
 
 @require_GET
 @ensure_csrf_cookie
@@ -36,6 +41,7 @@ def home_view(request: HttpRequest) -> HttpResponse:
         return render(request, "chatbot/home.html", {
             "remaining_today": remaining,
             "daily_quota": daily_quota,
+            "PJUD_VERSION": settings.PJUD_VERSION,
         })
     except Exception as e:
         tb_str = traceback.format_exc()
