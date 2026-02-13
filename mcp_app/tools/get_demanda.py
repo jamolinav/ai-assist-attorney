@@ -177,14 +177,17 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
         return {"status": "error", "message": str(e)}
 
 @app.task
-def update_demanda(task_id: str, causa_id: int, status: str) -> Dict[str, Any]:
+def update_demanda(task_id: str, data: Dict[str, Any], status: str) -> Dict[str, Any]:
     try:
-        logger.info(f"Actualizando causa_id {causa_id} con status {status}")
-        causa = Causa.objects.get(id=causa_id)
+        logger.info(f"Actualizando causa_id {data.get('causa_id')} con status {status}")
+        causa = Causa.objects.get(competencia_id=data["competencia_id"], corte_id=data["corte_id"], tribunal_id=data["tribunal_id"], tipo_id=data["tipo_id"], rol=data["rol"], anio=data["anio"])
         causa.status = status
-        return {"status": "success", "message": f"Causa {causa_id} actualizada a status {status}"}
+        causa.save(update_fields=["status"])
+        logger.info(f"Causa {causa.id} actualizada a status {status}")
+        return {"status": "success", "message": f"Causa {causa.id} actualizada a status {status}"}
     except Exception as e:
-        logger.error(f"Error al actualizar causa_id {causa_id}: {e}")
+        logger.error(f"Error al actualizar causa: {e}")
+        logger.error(traceback.format_exc())
         return {"status": "error", "message": str(e)}
 
 @app.task
@@ -213,7 +216,7 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         
         update_demanda.apply_async(task_id=f"update_demanda_{causa.id}", queue='pjud_azure', kwargs={
             "task_id": f"update_demanda_{causa.id}",
-            "causa_id": causa.id,
+            "data": data,
             "status": "processing"
         })
 
