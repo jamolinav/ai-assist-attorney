@@ -212,8 +212,8 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
                 rol=data["rol"],
                 anio=data["anio"],
                 titulo=data["titulo"],
-                pdf_dir="",
-                sqlite_path="",
+                pdf_dir=f'/{datetime.now().strftime("%Y-%m-%d")}/demand_{causa_id}',
+                sqlite_path=f'/{datetime.now().strftime("%Y-%m-%d")}/demand_{causa_id}.db',
                 status="processing",
                 created_by_id=user_id,
             )
@@ -313,8 +313,8 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
 
         # get causa again to get updated_at
         causa.refresh_from_db()
-        data['pdf_dir'] = f'/{causa.pdf_dir}'
-        data['sqlite_path'] = f'/{causa.sqlite_path}'
+        data['pdf_dir'] = f'{causa.pdf_dir}'
+        data['sqlite_path'] = f'{causa.sqlite_path}'
         update_demanda.apply_async(task_id=f"update_demanda_{causa.id}", queue='pjud_azure', kwargs={
             "task_id": f"update_demanda_{causa.id}",
             "data": data,
