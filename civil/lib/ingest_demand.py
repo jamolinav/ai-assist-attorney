@@ -128,6 +128,8 @@ def ingest_demand(self, *args, **options):
     # Estado → processing
     with transaction.atomic():
         demand.status = "processing"
+        demand.sqlite_path = os.path.join(datetime.now().strftime("%Y-%m-%d"), f"demand_{demand.id}.db")
+        demand.pdf_dir = os.path.join(os.path.join(datetime.now().strftime("%Y-%m-%d"), f"demand_{demand.id}"))
         demand.save(update_fields=["status"])
 
     try:

@@ -155,7 +155,7 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
 
         causa.pdf_dir = f'/{date_yyyymmdd}/demand_{causa.id}'
         causa.sqlite_path = f'/{date_yyyymmdd}/demand_{causa.id}.db'
-        causa.status = "processing"
+        causa.status = "pending"
         causa.save(update_fields=["pdf_dir", "sqlite_path", "status"])
 
         task_id = f'get_demanda_{RIT}'
@@ -182,7 +182,11 @@ def update_demanda(task_id: str, data: Dict[str, Any], status: str) -> Dict[str,
         logger.info(f"Actualizando causa_id {data.get('causa_id')} con status {status}")
         causa = Causa.objects.get(competencia_id=data["competencia_id"], corte_id=data["corte_id"], tribunal_id=data["tribunal_id"], tipo_id=data["tipo_id"], rol=data["rol"], anio=data["anio"])
         causa.status = status
-        causa.save(update_fields=["status"])
+        if 'pdf_dir' in data:
+            causa.pdf_dir = data['pdf_dir']
+        if 'sqlite_path' in data:
+            causa.sqlite_path = data['sqlite_path']
+        causa.save(update_fields=["status", "pdf_dir", "sqlite_path"])
         logger.info(f"Causa {causa.id} actualizada a status {status}")
         return {"status": "success", "message": f"Causa {causa.id} actualizada a status {status}"}
     except Exception as e:
@@ -197,8 +201,8 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         logger.info(f"Inicio de la tarea get_demanda {task_id} para causa_id {causa_id}, user_id {user_id}")
         print(f"Inicio de la tarea get_demanda {task_id} para causa_id {causa_id}, user_id {user_id}")
 
-        if Causa.objects.filter(id=causa_id).exists():
-            causa = Causa.objects.get(id=causa_id)
+        if Causa.objects.filter(competencia_id=data["competencia_id"], corte_id=data["corte_id"], tribunal_id=data["tribunal_id"], tipo_id=data["tipo_id"], rol=data["rol"], anio=data["anio"]).exists():
+            causa = Causa.objects.get(competencia_id=data["competencia_id"], corte_id=data["corte_id"], tribunal_id=data["tribunal_id"], tipo_id=data["tipo_id"], rol=data["rol"], anio=data["anio"])
         else:
             causa = Causa.objects.create(
                 competencia_id=data["competencia_id"],
@@ -307,9 +311,13 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
 
         logger.info(f"Tarea get_demanda {task_id} completada para RIT {RIT}. Actualizando estado a 'ready'.")
 
+        # get causa again to get updated_at
+        causa.refresh_from_db()
+        data['pdf_dir'] = causa.pdf_dir
+        data['sqlite_path'] = causa.sqlite_path
         update_demanda.apply_async(task_id=f"update_demanda_{causa.id}", queue='pjud_azure', kwargs={
             "task_id": f"update_demanda_{causa.id}",
-            "causa_id": causa.id,
+            "data": data,
             "status": "ready"
         })
  
