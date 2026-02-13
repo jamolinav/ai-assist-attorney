@@ -55,21 +55,6 @@
                 "required": ["RIT", "Corte", "Tribunal"]
             }
         },
-        "rag_search": {
-            "module": "mcp_app.tools.rag_search",
-            "method": "execute",
-            "description": "Realiza búsqueda semántica sobre resúmenes de conversaciones usando embeddings vectoriales.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "demand_id": {"type": "integer", "description": "ID de la demanda en la base de datos"},
-                    "question": {"type": "string", "description": "Pregunta o consulta a buscar semánticamente"},
-                    "k": {"type": "integer", "minimum": 1, "maximum": 50, "default": 8, "description": "Número máximo de resultados a retornar"}
-                },
-                "required": ["demand_id", "question"],
-                "additionalProperties": false
-            }
-        },
         "rag_query": {
             "module": "mcp_app.tools.rag_query",
             "method": "execute",

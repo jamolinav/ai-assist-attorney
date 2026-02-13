@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "¿Quiénes son las partes demandante y demandado en la causa rol 2399 año 2024 del 2° Juzgado Civil de Rancagua?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "Las partes en la causa rol 2399-2024 del 2° Juzgado Civil de Rancagua son el Banco del Estado de Chile como demandante y Juan Luis Espinoza García como demandado.",
+  "ts": "2026-02-13T01:50:50.653163"
+}

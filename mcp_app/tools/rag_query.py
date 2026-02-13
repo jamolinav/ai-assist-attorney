@@ -163,7 +163,19 @@ def rag_answer(demand_id: int, question: str, k: int = 8):
         msg = f"Demanda procesada con id={demand_id} no existe."
         logger.error("[RAG] %s", msg)
         raise RuntimeError(msg)
-    db_path = demand.sqlite_path
+    
+    WEBSITE_SITE_NAME = os.environ.get('WEBSITE_SITE_NAME', '')
+    SQLITE_PATH = os.getenv("SQLITE_PATH")
+
+    if 'azurewebsites.net' in WEBSITE_SITE_NAME:
+        db_path = f'{SQLITE_PATH}{demand.sqlite_path}'
+    else:
+        SQLITE_LOCAL_PATH = os.getenv("SQLITE_LOCAL_PATH")
+        db_path = f'{SQLITE_LOCAL_PATH}{demand.sqlite_path}'
+
+    logger.info("[RAG] Ruta SQLite determinada: %s", db_path)
+    
+    
     if not db_path or not os.path.exists(db_path):
         msg = "SQLite de la demanda no existe o no está registrado."
         logger.error("[RAG] %s path=%r", msg, db_path)

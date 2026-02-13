@@ -1,0 +1,10 @@
+{
+  "demand_id": 6,
+  "question": "a cuanto haciende la deuda",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-12/demand_6.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "La deuda asciende a $2.120.971.",
+  "ts": "2026-02-12T00:57:02.981961"
+}

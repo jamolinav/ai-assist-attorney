@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "Fechas relevantes en la causa rol 2399 año 2024 del 2° Juzgado Civil de Rancagua",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "Las fechas relevantes en la causa rol C-2399-2024 del 2° Juzgado Civil de Rancagua son: 2 de abril de 2024, 5 de abril de 2024, 29 de mayo de 2024, y 12 de julio de 2024.",
+  "ts": "2026-02-13T02:02:23.673693"
+}

@@ -1,0 +1,10 @@
+{
+  "demand_id": 6,
+  "question": "que fechas hay registradas?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-12/demand_6.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "Las fechas registradas son: 30-09-2024, 02-05-2025, 31-08-2025, 03-07-2024, 05/01/2026, 06/01/2026, 29/01/2026, 30/01/2026 y 10 de febrero del presente año.",
+  "ts": "2026-02-12T00:59:20.382316"
+}

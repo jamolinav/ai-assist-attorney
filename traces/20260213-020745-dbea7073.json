@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "¿René Francisco Tello Castro y Felipe Andrés Cataldo Moya son abogados del demandante o demandado en la causa rol 2399 año 2024 del 2° Juzgado Civil de Rancagua?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "René Francisco Tello Castro y Felipe Andrés Cataldo Moya son abogados del demandante, el Banco del Estado de Chile, en la causa rol 2399 año 2024 del 2° Juzgado Civil de Rancagua.",
+  "ts": "2026-02-13T02:07:45.942789"
+}

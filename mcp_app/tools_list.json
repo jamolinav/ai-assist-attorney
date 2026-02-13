@@ -52,13 +52,13 @@
         }
     },
     {
-        "name": "rag_search",
-        "description": "Realiza búsqueda semántica sobre resúmenes de conversaciones usando embeddings vectoriales.",
+        "name": "rag_query",
+        "description": "Realiza una búsqueda RAG (Recuperación Augmentada por Generación) en una base de datos SQLite específica de una demanda.",
         "parameters": {
             "type": "object",
             "properties": {
                 "demand_id": {"type": "integer", "description": "ID de la demanda en la base de datos"},
-                "question": {"type": "string", "description": "Pregunta o consulta a buscar semánticamente"},
+                "question": {"type": "string", "description": "Consulta o pregunta para realizar la búsqueda RAG"},
                 "k": {"type": "integer", "minimum": 1, "maximum": 50, "default": 8, "description": "Número máximo de resultados a retornar"}
             },
             "required": ["demand_id", "question"],

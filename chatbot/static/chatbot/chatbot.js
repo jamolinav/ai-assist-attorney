@@ -80,7 +80,7 @@
 
         // Interpret HTML from server in assistant messages
         if (role === 'assistant') {
-            bubble.innerHTML = `<strong>${author}:</strong> ${text}`;
+            bubble.innerHTML = text // `<strong>${author}:</strong> ${text}`;
         } else {
             bubble.textContent = text; // User messages as plain text
         }

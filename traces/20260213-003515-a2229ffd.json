@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "monto demandado?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "El monto demandado es de $6.329.241.- más intereses y costas.",
+  "ts": "2026-02-13T00:35:15.391551"
+}

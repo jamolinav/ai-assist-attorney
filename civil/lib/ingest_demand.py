@@ -113,7 +113,7 @@ def ingest_demand(self, *args, **options):
 
     # Crear/Resolver la demanda
     demand = resolve_or_create_demand(demand_id, title, pdf_dir, create_if_missing, created_by_id)
-
+    
     # Preparar el destino del SQLite
     download_dir = Path(os.getenv("SQLITE_LOCAL_PATH")) / datetime.now().strftime("%Y-%m-%d")
     download_dir.mkdir(parents=True, exist_ok=True)
@@ -135,6 +135,7 @@ def ingest_demand(self, *args, **options):
         total_chunks = 0
         with sqlite3.connect(str(db_path)) as con:
             for pdf in tqdm(files):
+                logger.info(f"Procesando PDF: {pdf}")
                 text = extract_pdf_text(str(pdf))
                 chunks = chunk_text(text, chunk_size, overlap)
                 if not chunks:

@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "¿Quiénes son los abogados en la causa rol 2399 año 2024 del 2° Juzgado Civil de Rancagua?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "Los abogados en la causa rol C-2399-2024 del 2° Juzgado Civil de Rancagua son René Francisco Tello Castro y Felipe Andrés Cataldo Moya.",
+  "ts": "2026-02-13T02:06:58.143436"
+}

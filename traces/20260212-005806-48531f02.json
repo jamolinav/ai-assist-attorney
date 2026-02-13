@@ -1,0 +1,10 @@
+{
+  "demand_id": 6,
+  "question": "dame un resumen en 3 lineas de esta causa",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-12/demand_6.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "La causa C-8-2026 del 1º Juzgado de Letras de Arica involucra a la Caja de Compensación de Asignación Familiar Los Andes como demandante. Se requiere la presentación de títulos ejecutivos y documentos relacionados, así como la acreditación de la representación legal mediante poder con firma electrónica. El abogado Loreto Beatriz Aliaga Loyola actúa en representación del demandante.",
+  "ts": "2026-02-12T00:58:06.248157"
+}

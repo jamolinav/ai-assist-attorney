@@ -143,8 +143,8 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
         else:
             pdf_dir.mkdir(parents=True, exist_ok=True)
 
-        causa.pdf_dir = str(pdf_dir)
-        causa.sqlite_path = str(db_path)
+        causa.pdf_dir = f'/{date_yyyymmdd}/demand_{causa.id}'
+        causa.sqlite_path = f'/{date_yyyymmdd}/demand_{causa.id}.db'
         causa.status = "processing"
         causa.save(update_fields=["pdf_dir", "sqlite_path", "status"])
 

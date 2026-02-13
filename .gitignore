@@ -1,6 +1,7 @@
 logs/**
 venv/**
 shell/**
+storage/**
 geckodriver.log
 .DS_Store
 

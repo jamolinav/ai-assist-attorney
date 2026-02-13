@@ -1,0 +1,10 @@
+{
+  "demand_id": 6,
+  "question": "cuando fue ingresada la demanda?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-12/demand_6.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "No fue posible obtener una respuesta concluyente con el contexto disponible.",
+  "ts": "2026-02-12T00:58:51.380939"
+}

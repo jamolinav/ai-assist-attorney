@@ -100,23 +100,23 @@ class MCPProcessor:
                 }
                 function_descriptions.append(function_description)
             
-            logger.info("Generated function descriptions: {}".format(function_descriptions))
+            logger.info(f"[core.generate_function_descriptions_from_tools_list] Generated function descriptions: {function_descriptions}")
             return function_descriptions
         except Exception as e:
-            logger.error("Error generating function descriptions from tools list: {}".format(e))
+            logger.error(f"[core.generate_function_descriptions_from_tools_list] Error generating function descriptions from tools list: {e}")
             logger.error(traceback.format_exc())
             return []
 
     def process_conversation(self, request, user_input):
         try:
-            logger.info("Loading tools list from tools_list.json")
+            logger.info("[core.process_conversation] Loading tools list from tools_list.json")
             messages = [{"role": "user", "content": user_input}]
             ai_response = send_message_with_assistant(request, messages, functions=self.generate_function_descriptions_from_tools_list())
-            logger.info(f"AI response: {ai_response}")
+            logger.info(f"[core.process_conversation] AI response: {ai_response}")
 
             return ai_response
         
         except Exception as e:
-            logger.error(f"Error in process_conversation: {e}")
+            logger.error(f"[core.process_conversation] Error: {e}")
             logger.error(traceback.format_exc())
             return "Lo siento, ha ocurrido un error al procesar tu solicitud."

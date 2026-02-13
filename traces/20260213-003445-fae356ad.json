@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "quienes son los litigantes?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "Los litigantes son Banco del Estado de Chile (demandante) y Juan Luis Espinoza García (demandado).",
+  "ts": "2026-02-13T00:34:45.357381"
+}

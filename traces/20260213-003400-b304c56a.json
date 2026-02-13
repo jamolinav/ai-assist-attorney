@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "dame un resumen en 4 lineas de esta causa",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "En el juicio ejecutivo entre el Banco del Estado de Chile y Juan Luis Espinoza García, el demandante renunció a invocar una causal de recusación contra el juez de la causa, solicitando que se resuelva directamente la demanda. El tribunal notificó a las partes sobre la certificación de la recusación y se les dio la oportunidad de realizar alegaciones. La causa se encuentra en el 2° Juzgado Civil de Rancagua, con el rol C-2399-2024.",
+  "ts": "2026-02-13T00:34:00.246673"
+}

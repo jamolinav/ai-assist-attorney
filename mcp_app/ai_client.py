@@ -77,6 +77,8 @@ def send_message_with_assistant(request, messages, functions):
             else:
                 raise
 
+        logger.info(f"Mensaje enviado al thread {thread.id}, esperando respuesta...")
+
         run = client.beta.threads.runs.create(
             thread_id=thread.id,
             assistant_id=ASSISTANT_ID,
@@ -127,7 +129,7 @@ def send_message_with_assistant(request, messages, functions):
                         continue
 
                     result = func(args)
-                    logger.info(f"Resultado de {func_name}: {result}")
+                    logger.info(f"[ai_client] Resultado de {func_name}: {result}")
 
                     outputs.append({
                         "tool_call_id": tool_call.id,
