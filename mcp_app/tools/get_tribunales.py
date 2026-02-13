@@ -21,6 +21,18 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
         offset = int(arguments.get("offset", 0))
         query = query.order_by(order_by)[offset:offset + limit]
 
+        '''
+        class Corte(models.Model):
+            nombre = models.CharField(max_length=100)
+            competencia = models.ForeignKey(Competencia, on_delete=models.CASCADE, related_name="cortes")
+
+            def __str__(self):
+                return f"{self.nombre} ({self.competencia.nombre})"
+
+        class Tribunal(models.Model):
+            nombre = models.CharField(max_length=150)
+            corte = models.ForeignKey(Corte, on_delete=models.CASCADE, related_name="tribunales")
+        '''
         # Campos a devolver
         fields: List[str] = arguments.get("fields") or ["id", "nombre", "jurisdiccion", "tipo_causa"]
         valid_fields = {f.name for f in Tribunal._meta.get_fields()}

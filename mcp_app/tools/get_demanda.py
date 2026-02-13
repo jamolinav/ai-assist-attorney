@@ -125,6 +125,16 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
                 status="pending",
                 created_by=None,
             )
+
+            datos_causa = {
+                "competencia_id": competencia.id,
+                "corte_id": corte.id,
+                "tribunal_id": tribunal.id,
+                "tipo_id": tipoLibro.id,
+                "rol": conRolCausa,
+                "anio": conEraCausa,
+                "titulo": f"Causa {RIT}",
+            }
         
         # Preparar el destino del SQLite
         sqlite_path = Path(os.getenv("SQLITE_PATH"))
@@ -154,6 +164,7 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
                                                                             "task_id": task_id,
                                                                             "causa_id": causa.id,
                                                                             "user_id": arguments.get("user_id"),
+                                                                            "data": datos_causa,
                                                                         })
         
         logger.info(f"Tarea get_demanda {task_id} iniciada para RIT {RIT}")
@@ -166,13 +177,46 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
         return {"status": "error", "message": str(e)}
 
 @app.task
-def get_demanda(task_id: str, causa_id: int, user_id: int = None) -> Dict[str, Any]:
+def update_demanda(task_id: str, causa_id: int, status: str) -> Dict[str, Any]:
+    try:
+        logger.info(f"Actualizando causa_id {causa_id} con status {status}")
+        causa = Causa.objects.get(id=causa_id)
+        causa.status = status
+        return {"status": "success", "message": f"Causa {causa_id} actualizada a status {status}"}
+    except Exception as e:
+        logger.error(f"Error al actualizar causa_id {causa_id}: {e}")
+        return {"status": "error", "message": str(e)}
+
+@app.task
+def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str, Any] = None) -> Dict[str, Any]:
 
     try:
         logger.info(f"Inicio de la tarea get_demanda {task_id} para causa_id {causa_id}, user_id {user_id}")
         print(f"Inicio de la tarea get_demanda {task_id} para causa_id {causa_id}, user_id {user_id}")
 
-        causa = Causa.objects.get(id=causa_id)
+        if Causa.objects.filter(id=causa_id).exists():
+            causa = Causa.objects.get(id=causa_id)
+        else:
+            causa = Causa.objects.create(
+                competencia_id=data["competencia_id"],
+                corte_id=data["corte_id"],
+                tribunal_id=data["tribunal_id"],
+                tipo_id=data["tipo_id"],
+                rol=data["rol"],
+                anio=data["anio"],
+                titulo=data["titulo"],
+                pdf_dir="",
+                sqlite_path="",
+                status="processing",
+                created_by_id=user_id,
+            )
+        
+        update_demanda.apply_async(task_id=f"update_demanda_{causa.id}", queue='pjud_azure', kwargs={
+            "task_id": f"update_demanda_{causa.id}",
+            "causa_id": causa.id,
+            "status": "processing"
+        })
+
         RIT = f"{causa.tipo.nombre[0]}-{str(causa.rol).zfill(4)}-{str(causa.anio)}"
         conTipoLibro = causa.tipo.nombre[0]
         conRolCausa = str(causa.rol).zfill(4)
@@ -238,6 +282,33 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None) -> Dict[str, A
         }
 
         ingest_demand(None, **options)
+
+        # upload sqlite to azure
+        from mcp_app.lib.azure_utils import upload_file_to_azure_file_share
+
+        date_yyyymmdd = datetime.now().strftime("%Y-%m-%d") # create directory per day
+
+        local_db_path = Path(os.getenv("SQLITE_LOCAL_PATH")) / date_yyyymmdd / f"demand_{causa.id}.db"
+        
+        try:
+            logger.info(f"Subiendo archivo a Azure File Share: {local_db_path}")
+            upload_file_to_azure_file_share(
+                connection_string=os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
+                share_name=os.getenv("AZURE_FILE_SHARE_NAME"),
+                local_file_path=local_db_path,
+                remote_file_path=f"{date_yyyymmdd}/demand_{causa.id}.db"
+            )
+        except Exception as e:
+            logger.error(f"Error al subir archivo a Azure File Share: {e}")
+            traceback.print_exc()
+
+        logger.info(f"Tarea get_demanda {task_id} completada para RIT {RIT}. Actualizando estado a 'ready'.")
+
+        update_demanda.apply_async(task_id=f"update_demanda_{causa.id}", queue='pjud_azure', kwargs={
+            "task_id": f"update_demanda_{causa.id}",
+            "causa_id": causa.id,
+            "status": "ready"
+        })
  
         return {
             "status": "success",

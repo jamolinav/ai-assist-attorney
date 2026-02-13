@@ -249,6 +249,9 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
     demand_id = arguments.get("demand_id")
     question = arguments.get("question")
     conversation_id = arguments.get("conversation_id") or str(uuid.uuid4())
+
+    print(f"RAG execute called with demand_id={demand_id} question={question!r} conversation_id={conversation_id}")
+    
     k = arguments.get("k", 8)
     t0 = time.perf_counter()
     try:

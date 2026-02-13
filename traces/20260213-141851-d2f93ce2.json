@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "algo registrado en 4 de abril?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "Se registró una resolución en el 2º Juzgado Civil de Rancagua con fecha 5 de abril de 2024.",
+  "ts": "2026-02-13T14:18:51.947655"
+}

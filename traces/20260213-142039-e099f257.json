@@ -1,0 +1,10 @@
+{
+  "demand_id": 7,
+  "question": "¿Qué se registra en la causa rol 2399 año 2024 del 2° Juzgado Civil de Rancagua para la fecha 4 de abril de 2024?",
+  "model": "gpt-4o-mini",
+  "db_path": "/Users/juanmolina/Documents/Github/ai-assist-attorney/storage/pjud/db/2026-02-13/demand_7.db",
+  "context_len": 16,
+  "top_chunks": [],
+  "answer": "El 4 de abril de 2024, se registró un mandato conferido por el Banco del Estado de Chile a sus abogados y apoderados en la causa rol C-2399-2024 del 2° Juzgado Civil de Rancagua.",
+  "ts": "2026-02-13T14:20:39.389385"
+}
