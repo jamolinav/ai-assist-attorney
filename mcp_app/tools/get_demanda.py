@@ -182,11 +182,7 @@ def update_demanda(task_id: str, data: Dict[str, Any], status: str) -> Dict[str,
         logger.info(f"Actualizando causa_id {data.get('causa_id')} con status {status}")
         causa = Causa.objects.get(competencia_id=data["competencia_id"], corte_id=data["corte_id"], tribunal_id=data["tribunal_id"], tipo_id=data["tipo_id"], rol=data["rol"], anio=data["anio"])
         causa.status = status
-        if 'pdf_dir' in data:
-            causa.pdf_dir = data['pdf_dir']
-        if 'sqlite_path' in data:
-            causa.sqlite_path = data['sqlite_path']
-        causa.save(update_fields=["status", "pdf_dir", "sqlite_path"])
+        causa.save(update_fields=["status"])
         logger.info(f"Causa {causa.id} actualizada a status {status}")
         return {"status": "success", "message": f"Causa {causa.id} actualizada a status {status}"}
     except Exception as e:

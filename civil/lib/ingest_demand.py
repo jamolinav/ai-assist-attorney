@@ -130,7 +130,7 @@ def ingest_demand(self, *args, **options):
         demand.status = "processing"
         demand.sqlite_path = os.path.join(datetime.now().strftime("%Y-%m-%d"), f"demand_{demand.id}.db")
         demand.pdf_dir = os.path.join(os.path.join(datetime.now().strftime("%Y-%m-%d"), f"demand_{demand.id}"))
-        demand.save(update_fields=["status"])
+        demand.save(update_fields=["status", "sqlite_path", "pdf_dir"])
 
     try:
         ensure_schema(str(db_path))
