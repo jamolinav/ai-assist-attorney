@@ -9,6 +9,7 @@ from pjud.celeryy import app
 from datetime import datetime, timedelta
 import os
 from pathlib import Path
+from chatbot.services.progress import new_progress, set_state, get_state
 
 logger = logging.getLogger('mcp_app')
 
@@ -30,7 +31,6 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
         params (dict): A dictionary containing the parameters for the get_demanda function.
     """
     # Call the get_demanda function with the provided parameters
-
 
     print("Starting get_demanda execution")
     
@@ -224,6 +224,12 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
             "status": "processing"
         })
 
+        # 1) Crear progreso
+        progress_key = new_progress()
+        logger.debug(f"Created progress tracker with key: {progress_key}")
+        print(f"Created progress tracker with key: {progress_key}")
+        set_state.delay(progress_key, "obteniendo_demanda")
+
         RIT = f"{causa.tipo.nombre[0]}-{str(causa.rol).zfill(4)}-{str(causa.anio)}"
         conTipoLibro = causa.tipo.nombre[0]
         conRolCausa = str(causa.rol).zfill(4)
@@ -271,6 +277,7 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         for idx, d in enumerate(table_detalle):
             print(f"{idx}: {d['folio']} - {d['tramite']}")
             consulta.descargar_pdf(table_detalle, idx, download_dir)
+            set_state.delay(progress_key, "obteniendo_demanda", {"current_folio": d['folio'], "current_tramite": d['tramite']})
     
         consulta.close()
         logger.info("Navegador cerrado.")   
@@ -320,6 +327,9 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
             "data": data,
             "status": "ready"
         })
+
+        set_state.delay(progress_key, "done")
+        logger.info(f"Tarea get_demanda {task_id} para RIT {RIT} actualizada a 'ready'.")
  
         return {
             "status": "success",

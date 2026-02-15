@@ -1,4 +1,5 @@
 import uuid
+from pjud.celeryy import app
 from typing import Literal, Optional
 from django.core.cache import cache
 
@@ -19,6 +20,7 @@ def new_progress() -> str:
     cache.set(CACHE_PREFIX + key, {"state": "queued"}, TTL_SECONDS)
     return key
 
+@app.task(queue="pjud_azure")
 def set_state(key: str, state: State, extra: Optional[dict] = None) -> None:
     data = {"state": state}
     if extra:

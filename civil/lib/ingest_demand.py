@@ -11,6 +11,7 @@ from civil.rag.sqlite_db import ensure_schema, insert_document, insert_chunk, in
 from civil.rag.utils_embed import embed_texts
 import logging
 from datetime import datetime
+from chatbot.services.progress import new_progress, set_state, get_state
 
 logger = logging.getLogger('civil')
 User = get_user_model()

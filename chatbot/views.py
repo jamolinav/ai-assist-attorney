@@ -139,7 +139,7 @@ def api_send(request: HttpRequest) -> JsonResponse:
         logger.info(f"[{request_id}] Calling MCP processor")
         try:
             processor = MCPProcessor()
-            state = {"progress_key": progress_key}  # Pasamos el progress_key para que el processor pueda actualizar el progreso
+            state = {"progress_key": 'starting'}
             response = processor.process_conversation(request, question, state)
             logger.debug(f"[{request_id}] MCP processor response: {response}")
             # E.G.: {'choices': [{'message': {'role': 'assistant', 'content': '¡Hola! ¿En qué puedo ayudarte hoy con respecto a alguna demanda o trámite judicial?'}}]}
@@ -162,10 +162,12 @@ def api_send(request: HttpRequest) -> JsonResponse:
             except Exception as e:
                 logger.error(f"[{request_id}] Error in billing: {str(e)}", exc_info=True)
         
-        if 'get_demanda' in state:
+        print(f"state: {state['progress_key']}")  # Debug del estado actual
+        if 'get_demanda' in state['progress_key']:
             set_state(progress_key, "obteniendo_demanda")
         else:
             set_state(progress_key, "done")
+
         process_time = time.time() - start_time
         logger.info(f"[{request_id}] Request completed in {process_time:.2f}s")
         

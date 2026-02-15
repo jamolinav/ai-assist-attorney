@@ -48,7 +48,7 @@ class Causa(models.Model):
     titulo = models.CharField(max_length=255)
 
     pdf_dir = models.CharField(max_length=2000)  # location of PDFs of the demand
-    sqlite_path = models.CharField(max_length=2000, unique=True)  # path to per-demand SQLite
+    sqlite_path = models.CharField(max_length=2000)  # path to per-demand SQLite
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
 
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
