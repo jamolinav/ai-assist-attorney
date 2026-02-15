@@ -12,7 +12,8 @@ State = Literal[
     "calling_llm",
     "streaming_answer",
     "done",
-"error",
+    "error",
+    "obteniendo_demanda",
 ]
 
 CACHE_PREFIX = "chatbot:progress:"
@@ -21,11 +22,11 @@ TTL_SECONDS = 60 * 10 # 10 minutos por defecto
 def new_progress() -> str:
     key = str(uuid.uuid4())
     cache.set(CACHE_PREFIX + key, {"state": "queued"}, TTL_SECONDS)
-    return key
+    logger.info(f"Created new progress tracker with key: {key}")
 
 @app.task(queue="pjud_azure")
 def set_state(key: str, state: State, extra: Optional[dict] = None) -> None:
-    logger.debug(f"Setting state for key {key} to {state} with extra: {extra}")
+    logger.info(f"Setting state for key {key} to {state} with extra: {extra}")
     data = {"state": state}
     if extra:
         data.update(extra)

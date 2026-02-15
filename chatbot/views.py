@@ -123,7 +123,7 @@ def api_send(request: HttpRequest) -> JsonResponse:
         
         # 2) Crear progreso
         progress_key = new_progress()
-        logger.debug(f"[{request_id}] Created progress tracker with key: {progress_key}")
+        logger.info(f"[{request_id}] Created progress tracker with key: {progress_key}")
         set_state(progress_key, "gathering_context")
         
         # 3) Preparar contexto del usuario (mock)
@@ -132,14 +132,13 @@ def api_send(request: HttpRequest) -> JsonResponse:
             # TODO: Adjuntar consentimiento para acceder a causas
             # TODO: Incluir flags/IDs de causas propias si fue autorizado
         }
-        logger.debug(f"[{request_id}] User context prepared: {user_context}")
+        logger.info(f"[{request_id}] User context prepared: {user_context}")
         
         set_state(progress_key, "calling_llm")
         # 4) Llamada mock a OpenAI
         logger.info(f"[{request_id}] Calling MCP processor")
         try:
             processor = MCPProcessor()
-            state = {"progress_key": 'starting'}
             response = processor.process_conversation(request, question, progress_key)
             logger.debug(f"[{request_id}] MCP processor response: {response}")
             # E.G.: {'choices': [{'message': {'role': 'assistant', 'content': '¡Hola! ¿En qué puedo ayudarte hoy con respecto a alguna demanda o trámite judicial?'}}]}
@@ -162,8 +161,8 @@ def api_send(request: HttpRequest) -> JsonResponse:
             except Exception as e:
                 logger.error(f"[{request_id}] Error in billing: {str(e)}", exc_info=True)
         
-        print(f"state: {state['progress_key']}")  # Debug del estado actual
-        if 'get_demanda' in state['progress_key']:
+
+        if 'en proceso de descarga' in answer.lower():
             set_state(progress_key, "obteniendo_demanda")
         else:
             set_state(progress_key, "done")

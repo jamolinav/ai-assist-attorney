@@ -232,7 +232,7 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         if progress_key:
             logger.info(f"Created progress tracker with key: {progress_key}")
             print(f"Created progress tracker with key: {progress_key}")
-            set_state.delay(progress_key, "obteniendo_demanda")
+            set_state.apply_async(task_id=f"set_state_gathering_context_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "gathering_context", "extra": {"message": "Iniciando consulta de causa..."}})
 
         RIT = f"{causa.tipo.nombre[0]}-{str(causa.rol).zfill(4)}-{str(causa.anio)}"
         conTipoLibro = causa.tipo.nombre[0]
