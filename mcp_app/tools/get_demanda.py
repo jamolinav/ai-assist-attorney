@@ -255,11 +255,17 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         existe = consulta.navegar_consulta_causas(conRolCausa, conEraCausa, strCompetencia, strCorte, strTribunal, conTipoLibro, max_reintentos=3)
         if not existe:
 
-            if progress_key:
-                set_state.apply_async(task_id=f"set_state_error_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "error", "extra": {"message": f"Causa con RIT {RIT} no encontrada"}})
-
+            consulta.close()
+            
             logger.info(f"La causa con RIT {RIT} no existe.")
             print(f"La causa con RIT {RIT} no existe.")
+
+            causa.status = "no_pjud_info_available_yet"
+            causa.save(update_fields=["status"])
+
+            if progress_key:
+                set_state.apply_async(task_id=f"set_state_no_info_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "done", "extra": {"message": f"Causa con RIT {RIT} no encontrada en el Poder Judicial. Se marcará para reintento futuro."}})
+
             return {
                 "status": "not_found",
                 "message": f"La causa con RIT {RIT} no existe.",

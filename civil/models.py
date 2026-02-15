@@ -35,6 +35,7 @@ class Causa(models.Model):
         ("processing", "processing"),
         ("ready", "ready"),
         ("error", "error"),
+        ("no_pjud_info_available_yet", "no_pjud_info_available_yet"),
     ]
     usuarios = models.ManyToManyField(User, related_name="causas")
     competencia = models.ForeignKey(Competencia, on_delete=models.PROTECT)
@@ -49,7 +50,7 @@ class Causa(models.Model):
 
     pdf_dir = models.CharField(max_length=2000)  # location of PDFs of the demand
     sqlite_path = models.CharField(max_length=2000)  # path to per-demand SQLite
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="pending")
 
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
