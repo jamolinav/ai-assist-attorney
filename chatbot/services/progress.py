@@ -14,6 +14,7 @@ State = Literal[
     "done",
     "error",
     "obteniendo_demanda",
+    "no_pjud_info_available_yet",
 ]
 
 CACHE_PREFIX = "chatbot:progress:"

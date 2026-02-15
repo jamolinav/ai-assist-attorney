@@ -253,7 +253,7 @@
                 // Actualizar el status-dot con estados específicos
                 updateStatusDot(state);
                 
-                if (state && state !== 'done' && state !== 'error') {
+                if (state && state !== 'done' && state !== 'error' && state !== 'no_pjud_info_available_yet') {
                     console.log('Scheduling next poll for state:', state);
                     setTimeout(() => pollProgress(key), 1000); // Cambiado a 1 segundo
                 } else {

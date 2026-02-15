@@ -264,7 +264,7 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
             causa.save(update_fields=["status"])
 
             if progress_key:
-                set_state.apply_async(task_id=f"set_state_no_info_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "done", "extra": {"message": f"Causa con RIT {RIT} no encontrada en el Poder Judicial. Se marcará para reintento futuro."}})
+                set_state.apply_async(task_id=f"set_state_no_info_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "no_pjud_info_available_yet", "extra": {"message": f"Causa con RIT {RIT} no encontrada en el Poder Judicial. Se marcará para reintento futuro."}})
 
             return {
                 "status": "not_found",
