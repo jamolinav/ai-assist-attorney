@@ -33,7 +33,7 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         return super(DateTimeEncoder, self).default(obj)
 
-def send_message_with_assistant(request, messages, functions, state=None):
+def send_message_with_assistant(request, messages, functions, progress_key):
     try:
         # Revisa si ya existe un thread en la sesión
         thread_id = request.session.get("openai_thread_id")
@@ -128,11 +128,9 @@ def send_message_with_assistant(request, messages, functions, state=None):
                         })
                         continue
 
+                    args['progress_key'] = progress_key
                     result = func(args)
                     logger.info(f"[ai_client] Resultado de {func_name}: {result}")
-
-                    if 'get_demanda' in func_name:
-                        state['progress_key'] = 'get_demanda_progress'
 
                     outputs.append({
                         "tool_call_id": tool_call.id,

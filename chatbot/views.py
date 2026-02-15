@@ -140,7 +140,7 @@ def api_send(request: HttpRequest) -> JsonResponse:
         try:
             processor = MCPProcessor()
             state = {"progress_key": 'starting'}
-            response = processor.process_conversation(request, question, state)
+            response = processor.process_conversation(request, question, progress_key)
             logger.debug(f"[{request_id}] MCP processor response: {response}")
             # E.G.: {'choices': [{'message': {'role': 'assistant', 'content': '¡Hola! ¿En qué puedo ayudarte hoy con respecto a alguna demanda o trámite judicial?'}}]}
             answer = response.get('choices', [{}])[0].get('message', {}).get('content', 'Error: no response')

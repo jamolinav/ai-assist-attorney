@@ -2,6 +2,9 @@ import uuid
 from pjud.celeryy import app
 from typing import Literal, Optional
 from django.core.cache import cache
+import logging, traceback
+
+logger = logging.getLogger('general')
 
 State = Literal[
     "queued",
@@ -22,10 +25,13 @@ def new_progress() -> str:
 
 @app.task(queue="pjud_azure")
 def set_state(key: str, state: State, extra: Optional[dict] = None) -> None:
+    logger.debug(f"Setting state for key {key} to {state} with extra: {extra}")
     data = {"state": state}
     if extra:
         data.update(extra)
     cache.set(CACHE_PREFIX + key, data, TTL_SECONDS)
 
 def get_state(key: str) -> dict:
-    return cache.get(CACHE_PREFIX + key, {"state": "error", "detail": "unknown key"})
+    state = cache.get(CACHE_PREFIX + key, {"state": "error", "detail": "unknown key"})
+    logger.debug(f"Retrieved state for key {key}: {state}")
+    return state

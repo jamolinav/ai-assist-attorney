@@ -60,6 +60,9 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
         strCompetencia = competencia.nombre
         strCorte = corte.nombre
         strTribunal = tribunal.nombre
+
+        progress_key = arguments.get("progress_key", None)
+
         print("Parametros procesados: conRolCausa =", conRolCausa, ", conEraCausa =", conEraCausa, ", conCompetencia =", strCompetencia, ", conCorte =", strCorte, ", conTribunal =", strTribunal, ", conTipoLibro =", conTipoLibro)
        #if arguments.get("user_id"):
        #     send_step(arguments["user_id"], "Iniciando la consulta de causas...")
@@ -165,6 +168,7 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
                                                                             "causa_id": causa.id,
                                                                             "user_id": arguments.get("user_id"),
                                                                             "data": datos_causa,
+                                                                            "progress_key": progress_key,
                                                                         })
         
         logger.info(f"Tarea get_demanda {task_id} iniciada para RIT {RIT}")
@@ -195,7 +199,7 @@ def update_demanda(task_id: str, data: Dict[str, Any], status: str) -> Dict[str,
         return {"status": "error", "message": str(e)}
 
 @app.task
-def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str, Any] = None) -> Dict[str, Any]:
+def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str, Any] = {}, progress_key: str = None) -> Dict[str, Any]:
 
     try:
         logger.info(f"Inicio de la tarea get_demanda {task_id} para causa_id {causa_id}, user_id {user_id}")
@@ -225,10 +229,10 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         })
 
         # 1) Crear progreso
-        progress_key = new_progress()
-        logger.debug(f"Created progress tracker with key: {progress_key}")
-        print(f"Created progress tracker with key: {progress_key}")
-        set_state.delay(progress_key, "obteniendo_demanda")
+        if progress_key:
+            logger.info(f"Created progress tracker with key: {progress_key}")
+            print(f"Created progress tracker with key: {progress_key}")
+            set_state.delay(progress_key, "obteniendo_demanda")
 
         RIT = f"{causa.tipo.nombre[0]}-{str(causa.rol).zfill(4)}-{str(causa.anio)}"
         conTipoLibro = causa.tipo.nombre[0]
@@ -250,6 +254,10 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         consulta.iniciar_navegador()
         existe = consulta.navegar_consulta_causas(conRolCausa, conEraCausa, strCompetencia, strCorte, strTribunal, conTipoLibro, max_reintentos=3)
         if not existe:
+
+            if progress_key:
+                set_state.delay(progress_key, "error", {"message": f"La causa con RIT {RIT} no existe."})
+                
             logger.info(f"La causa con RIT {RIT} no existe.")
             print(f"La causa con RIT {RIT} no existe.")
             return {
@@ -277,7 +285,9 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         for idx, d in enumerate(table_detalle):
             print(f"{idx}: {d['folio']} - {d['tramite']}")
             consulta.descargar_pdf(table_detalle, idx, download_dir)
-            set_state.delay(progress_key, "obteniendo_demanda", {"current_folio": d['folio'], "current_tramite": d['tramite']})
+
+            if progress_key:
+                set_state.delay(progress_key, "obteniendo_demanda", {"current_folio": d['folio'], "current_tramite": d['tramite']})
     
         consulta.close()
         logger.info("Navegador cerrado.")   
@@ -328,7 +338,9 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
             "status": "ready"
         })
 
-        set_state.delay(progress_key, "done")
+        if progress_key:
+            set_state.delay(progress_key, "done")
+
         logger.info(f"Tarea get_demanda {task_id} para RIT {RIT} actualizada a 'ready'.")
  
         return {
