@@ -195,6 +195,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGOUT_REDIRECT_URL = '/chatbot/chat/'
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
+    }
+}
+
 CELERY_BROKER_URL       = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
 CELERY_RESULT_BACKEND   = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
 # Configuración del broker Redis para Celery
