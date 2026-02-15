@@ -129,15 +129,15 @@ def execute(arguments: Dict[str, Any]) -> Dict[str, Any]:
                 created_by=None,
             )
 
-            datos_causa = {
-                "competencia_id": competencia.id,
-                "corte_id": corte.id,
-                "tribunal_id": tribunal.id,
-                "tipo_id": tipoLibro.id,
-                "rol": conRolCausa,
-                "anio": conEraCausa,
-                "titulo": f"Causa {RIT}",
-            }
+        datos_causa = {
+            "competencia_id": competencia.id,
+            "corte_id": corte.id,
+            "tribunal_id": tribunal.id,
+            "tipo_id": tipoLibro.id,
+            "rol": conRolCausa,
+            "anio": conEraCausa,
+            "titulo": f"Causa {RIT}",
+        }
         
         # Preparar el destino del SQLite
         sqlite_path = Path(os.getenv("SQLITE_PATH"))
@@ -256,7 +256,7 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         if not existe:
 
             consulta.close()
-            
+
             logger.info(f"La causa con RIT {RIT} no existe.")
             print(f"La causa con RIT {RIT} no existe.")
 
