@@ -292,14 +292,42 @@ body::before {
     color: var(--bubble-text);
 }
 
+/* Animación para status-dot */
 .status-dot {
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: var(--status-dot-color);
+    background-color: currentColor;
     margin-right: 4px;
-    animation: pulse 2s infinite;
+}
+
+.status-dot-pulse {
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.status-dot-error {
+    animation: blink-dot 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes blink-dot {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
 }
 
 @keyframes pulse {

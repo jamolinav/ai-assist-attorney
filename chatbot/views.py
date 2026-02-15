@@ -139,7 +139,8 @@ def api_send(request: HttpRequest) -> JsonResponse:
         logger.info(f"[{request_id}] Calling MCP processor")
         try:
             processor = MCPProcessor()
-            response = processor.process_conversation(request, question)
+            state = {"progress_key": progress_key}  # Pasamos el progress_key para que el processor pueda actualizar el progreso
+            response = processor.process_conversation(request, question, state)
             logger.debug(f"[{request_id}] MCP processor response: {response}")
             # E.G.: {'choices': [{'message': {'role': 'assistant', 'content': '¡Hola! ¿En qué puedo ayudarte hoy con respecto a alguna demanda o trámite judicial?'}}]}
             answer = response.get('choices', [{}])[0].get('message', {}).get('content', 'Error: no response')
@@ -161,7 +162,10 @@ def api_send(request: HttpRequest) -> JsonResponse:
             except Exception as e:
                 logger.error(f"[{request_id}] Error in billing: {str(e)}", exc_info=True)
         
-        set_state(progress_key, "done")
+        if 'get_demanda' in state:
+            set_state(progress_key, "obteniendo_demanda")
+        else:
+            set_state(progress_key, "done")
         process_time = time.time() - start_time
         logger.info(f"[{request_id}] Request completed in {process_time:.2f}s")
         
@@ -193,7 +197,8 @@ def api_progress(request: HttpRequest) -> JsonResponse:
     key = request.GET.get("key")
     ip = get_client_ip(request)
     
-    logger.debug(f"Progress check from IP: {ip} for key: {key}")
+    logger.info(f"Progress check from IP: {ip} for key: {key}")
+    print(f"Progress check for key: {key} from IP: {ip}")
     
     if not key:
         logger.warning(f"Missing 'key' parameter in progress check from IP: {ip}")

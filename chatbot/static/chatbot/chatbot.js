@@ -235,22 +235,97 @@
     // Poll for progress updates
     async function pollProgress(key) {
         try {
+
+            console.log('Polling progress for key:', key);
             const url = new URL(window.location.origin + '/chatbot/api/progress/');
             url.searchParams.set('key', key);
+            console.log('Polling URL:', url);
             const res = await fetch(url);
+            console.log('Progress response status:', res.status);
             if (!res.ok) return;
             
             const data = await res.json();
+            console.log('Progress data received:', data);
             if (data.status === 'ok') {
                 const state = data.progress.state;
                 markStep(state);
+                
+                // Actualizar el status-dot con estados específicos
+                updateStatusDot(state);
+                
                 if (state && state !== 'done' && state !== 'error') {
-                    setTimeout(() => pollProgress(key), 800);
+                    console.log('Scheduling next poll for state:', state);
+                    setTimeout(() => pollProgress(key), 1000); // Cambiado a 1 segundo
+                } else {
+                    // Asegurar que vuelva a estado activo cuando termine
+                    console.log('Final state reached:', state);
+                    setTimeout(() => {
+                        if (chatStatus) {
+                            chatStatus.className = 'badge rounded-pill bg-success';
+                            chatStatus.innerHTML = '<span class="status-dot"></span> Activo';
+                        }
+                    }, 500);
                 }
             }
         } catch (e) {
             console.error('poll error', e);
         }
+    }
+
+    // Nueva función para actualizar el status-dot según el estado
+    function updateStatusDot(state) {
+        if (!chatStatus) return;
+        
+        const statusMessages = {
+            'queued': {
+                className: 'badge rounded-pill bg-info',
+                text: '<span class="status-dot status-dot-pulse"></span> En cola'
+            },
+            'gathering_context': {
+                className: 'badge rounded-pill bg-primary',
+                text: '<span class="status-dot status-dot-pulse"></span> Analizando contexto'
+            },
+            'calling_llm': {
+                className: 'badge rounded-pill bg-warning',
+                text: '<span class="status-dot status-dot-pulse"></span> Consultando IA'
+            },
+            'streaming_answer': {
+                className: 'badge rounded-pill bg-warning',
+                text: '<span class="status-dot status-dot-pulse"></span> Generando respuesta'
+            },
+            'done': {
+                className: 'badge rounded-pill bg-success',
+                text: '<span class="status-dot"></span> Completado'
+            },
+            'obteniendo_demanda': {
+                className: 'badge rounded-pill bg-secondary',
+                text: '<span class="status-dot status-dot-pulse"></span> Obteniendo demanda'
+            },
+            'ingresando_poder_judicial': {
+                className: 'badge rounded-pill bg-secondary',
+                text: '<span class="status-dot status-dot-pulse"></span> Ingresando al Poder Judicial'
+            },
+            'descargando_pdf_demanda': {
+                className: 'badge rounded-pill bg-secondary',
+                text: '<span class="status-dot status-dot-pulse"></span> Descargando PDF de demanda'
+            },
+            'descargando_tramites': {
+                className: 'badge rounded-pill bg-secondary',
+                text: '<span class="status-dot status-dot-pulse"></span> Descargando trámites'
+            },
+            'cargando_datos_en_llm': {
+                className: 'badge rounded-pill bg-secondary',
+                text: '<span class="status-dot status-dot-pulse"></span> Cargando datos en IA'
+            },
+            'error': {
+                className: 'badge rounded-pill bg-danger',
+                text: '<span class="status-dot status-dot-error"></span> Error'
+            }
+        };
+        
+        const status = statusMessages[state] || statusMessages['queued'];
+        chatStatus.className = status.className;
+        chatStatus.innerHTML = status.text;
     }
 
     // Form submission

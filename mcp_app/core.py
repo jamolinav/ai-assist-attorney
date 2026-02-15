@@ -107,11 +107,11 @@ class MCPProcessor:
             logger.error(traceback.format_exc())
             return []
 
-    def process_conversation(self, request, user_input):
+    def process_conversation(self, request, user_input, state):
         try:
             logger.info("[core.process_conversation] Loading tools list from tools_list.json")
             messages = [{"role": "user", "content": user_input}]
-            ai_response = send_message_with_assistant(request, messages, functions=self.generate_function_descriptions_from_tools_list())
+            ai_response = send_message_with_assistant(request, messages, functions=self.generate_function_descriptions_from_tools_list(), state=state)
             logger.info(f"[core.process_conversation] AI response: {ai_response}")
 
             return ai_response

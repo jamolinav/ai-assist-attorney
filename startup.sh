@@ -1,1 +1,2 @@
-exec gunicorn pjud.asgi:application -k uvicorn.workers.UvicornWorker -w 1 -b 0.0.0.0:8100 --timeout 600
+#exec gunicorn pjud.asgi:application -k uvicorn.workers.UvicornWorker -w 1 -b 0.0.0.0:8100 --timeout 600
+celery -A pjud worker -Q pjud_azure -l info & gunicorn --bind=0.0.0.0 --timeout 600 --workers 2 pjud.wsgi
