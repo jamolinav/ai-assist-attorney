@@ -256,8 +256,8 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         if not existe:
 
             if progress_key:
-                set_state.delay(progress_key, "error", {"message": f"La causa con RIT {RIT} no existe."})
-                
+                set_state.apply_async(task_id=f"set_state_error_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "error", "extra": {"message": f"Causa con RIT {RIT} no encontrada"}})
+
             logger.info(f"La causa con RIT {RIT} no existe.")
             print(f"La causa con RIT {RIT} no existe.")
             return {
@@ -287,8 +287,8 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
             consulta.descargar_pdf(table_detalle, idx, download_dir)
 
             if progress_key:
-                set_state.delay(progress_key, "obteniendo_demanda", {"current_folio": d['folio'], "current_tramite": d['tramite']})
-    
+                set_state.apply_async(task_id=f"set_state_obteniendo_demanda_{causa.id}_{idx}", queue='pjud_azure', kwargs={"key": progress_key, "state": "obteniendo_demanda", "extra": {"message": f"Descargando trámite {d['tramite']} (folio {d['folio']})"}})
+
         consulta.close()
         logger.info("Navegador cerrado.")   
         print("Navegador cerrado.")
@@ -339,7 +339,7 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         })
 
         if progress_key:
-            set_state.delay(progress_key, "done")
+            set_state.apply_async(task_id=f"set_state_ready_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "ready", "extra": {"message": f"Causa con RIT {RIT} procesada correctamente"}})
 
         logger.info(f"Tarea get_demanda {task_id} para RIT {RIT} actualizada a 'ready'.")
  
@@ -351,4 +351,9 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
     except Exception as e:
         logger.error(f"Error en la tarea get_demanda {task_id} para RIT {RIT}: {e}")
         logger.error(traceback.format_exc())
-        return {"status": "error", "message": str(e)}
+        if progress_key:
+            set_state.apply_async(task_id=f"set_state_error_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "error", "extra": {"message": str(e)}})
+        return {
+            "status": "error",
+            "message": str(e)
+        }
