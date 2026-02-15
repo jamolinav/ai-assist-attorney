@@ -21,8 +21,11 @@ TTL_SECONDS = 60 * 10 # 10 minutos por defecto
 
 def new_progress() -> str:
     key = str(uuid.uuid4())
+    print(f"Creating new progress tracker with key: {key}")
     cache.set(CACHE_PREFIX + key, {"state": "queued"}, TTL_SECONDS)
+    print(f"Created new progress tracker with key: {key}")
     logger.info(f"Created new progress tracker with key: {key}")
+    return key
 
 @app.task(queue="pjud_azure")
 def set_state(key: str, state: State, extra: Optional[dict] = None) -> None:

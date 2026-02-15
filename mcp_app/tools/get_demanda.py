@@ -339,7 +339,7 @@ def get_demanda(task_id: str, causa_id: int, user_id: int = None, data: Dict[str
         })
 
         if progress_key:
-            set_state.apply_async(task_id=f"set_state_ready_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "ready", "extra": {"message": f"Causa con RIT {RIT} procesada correctamente"}})
+            set_state.apply_async(task_id=f"set_state_ready_{causa.id}", queue='pjud_azure', kwargs={"key": progress_key, "state": "done", "extra": {"message": f"Causa con RIT {RIT} procesada correctamente"}})
 
         logger.info(f"Tarea get_demanda {task_id} para RIT {RIT} actualizada a 'ready'.")
  
